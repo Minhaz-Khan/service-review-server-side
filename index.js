@@ -29,6 +29,12 @@ async function run() {
             const result = await cursor.toArray();
             res.send(result);
         })
+        app.post('/services', async (req, res) => {
+            const service = req.body;
+            const result = await servicesCollection.insertOne(service);
+            res.send(result)
+
+        })
         app.get('/services/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) }
@@ -36,16 +42,43 @@ async function run() {
             res.send(result)
 
         })
-        app.get('/reviews', async (req, res) => {
-            const query = {};
+        app.get('/reviews/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { serviceId: id };
             const cursor = reviewsCollection.find(query);
             const reviews = await cursor.toArray();
             res.send(reviews);
 
         })
-        app.post('/reviews', async (req, res) => {
+        // app.get('/myreview/:email', async (req, res) => {
+        //     const email = req.params.email;
+        //     const query = { email: email };
+        //     const cursor = reviewsCollection.find(query);
+        //     const reviews = await cursor.toArray();
+        //     res.send(reviews);
+
+        // })
+        app.get('/myreview', async (req, res) => {
+            let query = {};
+            if (req.query.email) {
+                query = {
+                    email: req.query.email
+                }
+            }
+            const cursor = reviewsCollection.find(query);
+            const result = await cursor.toArray();
+            res.send(result)
+        })
+        app.post('/review', async (req, res) => {
             const doc = req.body;
-            console.log(doc);
+            const result = await reviewsCollection.insertOne(doc)
+            const id = req.body.serviceId;
+            const query = { serviceId: id };
+            const cursor = reviewsCollection.find(query);
+            const reviews = await cursor.toArray();
+            console.log(reviews);
+            res.send(reviews);
+
         })
     }
     catch { }

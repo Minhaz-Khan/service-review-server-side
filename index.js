@@ -50,23 +50,25 @@ async function run() {
             res.send(reviews);
 
         })
-        // app.get('/myreview/:email', async (req, res) => {
-        //     const email = req.params.email;
-        //     const query = { email: email };
-        //     const cursor = reviewsCollection.find(query);
-        //     const reviews = await cursor.toArray();
-        //     res.send(reviews);
-
-        // })
-        app.get('/myreview', async (req, res) => {
-            let query = {};
-            if (req.query.email) {
-                query = {
-                    email: req.query.email
-                }
-            }
+        app.get('/myreview/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email: email };
             const cursor = reviewsCollection.find(query);
-            const result = await cursor.toArray();
+            const reviews = await cursor.toArray();
+            res.send(reviews);
+
+        })
+
+        app.get('/myreviewDetails/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await reviewsCollection.findOne(query);
+            res.send(result)
+        })
+        app.delete('/myreviewDetails/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await reviewsCollection.deleteOne(query);
             res.send(result)
         })
         app.post('/review', async (req, res) => {

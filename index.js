@@ -65,6 +65,12 @@ async function run() {
             const result = await reviewsCollection.findOne(query);
             res.send(result)
         })
+        app.put('/myreviewDetails/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const updatedReview = req.body;
+            console.log(updatedReview);
+        })
         app.delete('/myreviewDetails/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };

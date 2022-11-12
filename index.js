@@ -19,7 +19,7 @@ function verifyJWT(req, res, next) {
     const token = authHeader.split(' ')[1];
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function (err, decoded) {
         if (err) {
-            return res.status(403).send({ message: 'unauthorized access' })
+            return res.status(403).send({ message: 'unauthorized access 2' })
         }
         req.decoded = decoded
         next()
@@ -36,7 +36,7 @@ async function run() {
 
         app.post('/jwt', (req, res) => {
             const user = req.body;
-            const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' })
+            const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '10h' })
             res.send({ token })
         })
 
@@ -78,9 +78,12 @@ async function run() {
         app.get('/myreview/:email', verifyJWT, async (req, res) => {
             const decoded = req.decoded;
             console.log(decoded);
+            if (decoded.user !== req.params.email) {
+                return res.status(403).send({ message: 'unautorized access 3' })
+            }
             const email = req.params.email;
             const query = { email: email };
-            const cursor = reviewsCollection.find(query);
+            const cursor = reviewsCollection.find(query).sort({ timestamp: 1 });
             const reviews = await cursor.toArray();
             res.send(reviews);
 
@@ -118,7 +121,7 @@ async function run() {
             const result = await reviewsCollection.insertOne(doc)
             const id = req.body.serviceId;
             const query = { serviceId: id };
-            const cursor = reviewsCollection.find(query);
+            const cursor = reviewsCollection.find(query).sort({ timestamp: 1 });
             const reviews = await cursor.toArray();
             console.log(reviews);
             res.send(reviews);
